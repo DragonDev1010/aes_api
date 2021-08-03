@@ -4,6 +4,9 @@ var aes = require('./aes_lib/wbaes-smoke-umd.js')
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const ecies = require('ecies-parity')
+const bip39 = require('bip39')
+const hd = require('hdkey')
 
 const app = express();
 app.use(express.json());
@@ -15,23 +18,39 @@ var options = {
 };
 
 
-app.post('/post-test', (req, res) => {
-    const ec_key = req.body.ec_key;
-    const aes_key = req.body.aes_key;
-    const ec_res = encrypt(ec_key)
-    const aes_res = encrypt(aes_key)
-    console.log(ec_res)
-    console.log(aes_res)
-    console.log(Buffer.from(ec_res).toString('base64'));
-    console.log(Buffer.from(aes_res).toString('base64'));
-    // res.sendStatus(200);    
-    res.send({
-        "Encrypted EC Key": Buffer.from(ec_res).toString('base64'),
-        "Encrypted AES Key": Buffer.from(aes_res).toString('base64')
-    })
+app.post('/post-test', async (req, res) => {
+    try{
+        const aesKey = req.body.aesKey
+        var aesKey_whiteBox = aes.encrypt(aesKey, options)
+
+        const derivationPath = "m/44'/60'/0'/0/0";
+        const publicEcKey = req.body.eckey 
+        const seed = await bip39.mnemonicToSeed(publicEcKey)        
+        const node = hd.fromMasterSeed(seed)
+        const hdkey = node.derive(derivationPath)
+        const privateKey = hdkey._privateKey
+        const publicKey = ecies.getPublic(privateKey)
+
+        const encrypted = await ecies.encrypt(publicKey, Buffer.from("text"));
+        console.log(encrypted.toString('base64'))
+        res.send({
+            "Encrypted Result": encrypted.toString('base64')
+        })
+    } catch (err) {
+        console.error(err)
+    }
 });
 function encrypt(plain) {
     var temp = aes.encrypt(plain, options)
     return (temp);
 }
-app.listen(8080, () => console.log(`Started server at http://localhost:8080!`));
+function str2ab(str) {
+    var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+    var bufView = new Uint16Array(buf);
+    for (var i=0, strLen=str.length; i < strLen; i++) {
+      bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
+  }
+var server = app.listen(8080, () => console.log(`Started server at http://localhost:8080!`));
+// server.close()

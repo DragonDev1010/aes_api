@@ -10,8 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bip39": "^3.0.4",
     "body-parser": "^1.19.0",
+    "ecies-parity": "^0.1.1",
     "express": "^4.17.1",
+    "hdkey": "^2.0.1",
     "nodemon": "^2.0.12"
   }
 }
