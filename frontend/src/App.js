@@ -4,6 +4,9 @@ import './App.css';
 import {useState, useEffect} from "react";
 
 function App() {
+    function callAPI() {
+        console.log('call api method')
+    }
     const [mounted, setMounted] = useState(false)
     useEffect(() =>{
         // This is similar to componentDidMount
@@ -11,7 +14,10 @@ function App() {
         console.log('call backend')
         fetch("http://127.0.0.1:8080").
             then(
-                console.log('fetch')
+                console.log('fetch'),
+                res => res.json()
+            ).then(
+                res => console.log(res)
             )
     },[])
     return (
@@ -28,7 +34,7 @@ function App() {
                     <input type="text" placeholder="encrypted result"></input>
                 </div>
                 <div id="encrypt_click">
-                    <button>Encrypt</button>
+                    <button onClick={callAPI}>Encrypt</button>
                 </div>
             </div>
 

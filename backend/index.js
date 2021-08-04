@@ -22,36 +22,49 @@ var options = {
 
 app.get('/', async(req, res) => {
     res.send({
-        "send": "ok"
+        "cdg": "cdg great"
     })
 })
-app.post('/post-test', async (req, res) => {
+app.post('/encrypt', async (req, res) => {
     try{
-        const aesKey = req.body.aesKey
-        var aesKey_whiteBox = aes.encrypt(aesKey, options)
-
+        const aes_plain = req.body.aesPlain
+        
         const derivationPath = "m/44'/60'/0'/0/0";
         const publicEcKey = req.body.eckey 
-        const seed = await bip39.mnemonicToSeed(publicEcKey)        
-        const node = hd.fromMasterSeed(seed)
-        const hdkey = node.derive(derivationPath)
-        const privateKey = hdkey._privateKey
-        const publicKey = ecies.getPublic(privateKey)
+        let seed = await bip39.mnemonicToSeed(publicEcKey)        
+        let node = hd.fromMasterSeed(seed)
+        let hdkey = node.derive(derivationPath)
+        let privateKey = hdkey._privateKey
+        let publicKey = ecies.getPublic(privateKey)
 
-        const encrypted = await ecies.encrypt(publicKey, Buffer.from("text"));
-        // console.log(encrypted.toString('base64'))
 
-        const decrypted = await ecies.decrypt(privateKey, encrypted)
-        // console.log(String.fromCharCode.apply(null, decrypted));
+        var cipher_txt = aes.encrypt(aes_plain, options)
+        let encrypted = await ecies.encrypt(publicKey, cipher_txt);
+
+        
 
         res.send({
-            "Encrypted Result": encrypted.toString('base64'),
-            "Decrypted Result": decrypted
+            "Encrypted Result (base64)": encrypted.toString('base64'),
+            "privateKey": privateKey.toString('base64')
         })
     } catch (err) {
         console.error(err)
     }
 });
+app.post('/decrypt', async(req, res) => {
+    try{
+        const encrypted = Buffer.from(req.body.encrypted, 'base64')
+        const privateKey = Buffer.from(req.body.privateKey, 'base64')
+        
+        let ttt = await ecies.decrypt(privateKey, encrypted)
+        let aes_plain_re = aes.decrypt(ttt.toString('utf8'), options)
+        res.send({
+            "AES plain text": aes_plain_re
+        })
+    } catch (err) {
+        console.error(err)
+    }
+})
 function encrypt(plain) {
     var temp = aes.encrypt(plain, options)
     return (temp);
