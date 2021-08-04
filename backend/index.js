@@ -1,5 +1,7 @@
 // index.js
 
+var cors = require('cors')
+
 var aes = require('./aes_lib/wbaes-smoke-umd.js')
 
 const express = require('express');
@@ -9,6 +11,7 @@ const bip39 = require('bip39')
 const hd = require('hdkey')
 
 const app = express();
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -17,7 +20,11 @@ var options = {
     encoding: 'str'
 };
 
-
+app.get('/', async(req, res) => {
+    res.send({
+        "send": "ok"
+    })
+})
 app.post('/post-test', async (req, res) => {
     try{
         const aesKey = req.body.aesKey
