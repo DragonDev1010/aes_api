@@ -33,8 +33,13 @@ app.post('/post-test', async (req, res) => {
 
         const encrypted = await ecies.encrypt(publicKey, Buffer.from("text"));
         console.log(encrypted.toString('base64'))
+
+        const decrypted = await ecies.decrypt(privateKey, encrypted)
+        console.log(String.fromCharCode.apply(null, decrypted));
+
         res.send({
-            "Encrypted Result": encrypted.toString('base64')
+            "Encrypted Result": encrypted.toString('base64'),
+            "Decrypted Result": decrypted
         })
     } catch (err) {
         console.error(err)
