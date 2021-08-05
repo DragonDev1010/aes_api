@@ -80,30 +80,6 @@
         }
         return counterBlock;
     };
-    Aes.encryptBytes = function(plaintext, counterBlock) {
-        var b,
-            i;
-        var nBlocks = Math.ceil(plaintext.length / Aes.blockSize);
-        var ciphertext = [];
-        for (b = 0; b < nBlocks; b++) {
-            var encryptedCntr = Aes.encryptBlock(counterBlock);
-            var blockLength = b < nBlocks - 1 ? Aes.blockSize : (plaintext.length - 1) % Aes.blockSize + 1;
-            var encryptedChars = [];
-            for (i = 0; i < blockLength; i++) {
-                encryptedChars[i] = encryptedCntr[i] ^ plaintext[b * Aes.blockSize + i];
-            }
-            ciphertext = ciphertext.concat(encryptedChars);
-            for (i = 15; i >= 8; i--) {
-                if (counterBlock[i] === 255) {
-                    counterBlock[i] = 0;
-                } else {
-                    counterBlock[i]++;
-                    break;
-                }
-            }
-        }
-        return ciphertext;
-    };
     Aes.decrypt = function(ciphertext, configuration) {
         if (typeof configuration === 'undefined') {
             configuration = {};

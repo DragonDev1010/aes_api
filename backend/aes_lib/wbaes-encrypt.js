@@ -142,35 +142,6 @@
         }
         return ciphertext;
     };
-    Aes.decryptBytes = function(ciphertext, counterBlock) {
-        var i,
-            b;
-        var offset = Aes.blockSize;
-        var nBlocks = Math.ceil((ciphertext.length - offset) / Aes.blockSize);
-        var ct = [];
-        for (b = 0; b < nBlocks; b++) {
-            ct[b] = Aes.s2a(ciphertext.slice(offset + b * Aes.blockSize, offset + (b + 1) * Aes.blockSize));
-        }
-        ciphertext = ct;
-        var plaintextBytes = [];
-        for (b = 0; b < nBlocks; b++) {
-            var cipherCntr = Aes.encryptBlock(counterBlock);
-            var blockBytes = new Array(ciphertext[b].length);
-            for (i = 0; i < ciphertext[b].length; i++) {
-                blockBytes[i] = cipherCntr[i] ^ ciphertext[b][i];
-            }
-            plaintextBytes = plaintextBytes.concat(blockBytes);
-            for (i = 15; i >= 8; i--) {
-                if (counterBlock[i] === 255) {
-                    counterBlock[i] = 0;
-                } else {
-                    counterBlock[i]++;
-                    break;
-                }
-            }
-        }
-        return plaintextBytes;
-    };
     Aes.shiftRows = function(state) {
         var rows = new Array(4);
         for (var i = 0; i < rows.length; i++) {
