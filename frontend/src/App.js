@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 
-import {useState, useEffect} from "react";
+import {useState, useEffect, useDebugValue} from "react";
 
 function App() {
     var [aesPlain, setAesPlain] = useState('')
@@ -9,6 +9,8 @@ function App() {
     
     var [encrypted, setEncrypted] = useState('')
     var [privateKey, setPrivateKey] = useState('')
+
+    var [decrypted, setDecrypted] = useState('')
     function callEncryptAPI() {
         // console.log({ecKey}, ' : ', {aesPlain})
         // console.log('call api method')
@@ -46,7 +48,7 @@ function App() {
             .then(
                 response => response.json()
             ).then((res) => {
-                console.log(res)
+                setDecrypted(res.decrypted)
             })
     }
     return (
@@ -54,30 +56,17 @@ function App() {
             <div id="encrypt">
                 <p>Encrypt</p>
                 <div id="input">
-                    <p>Input: </p>
-                    <input type="text" placeholder="ec key" value={ecKey} onChange={e=>setEcKey(e.target.value)}></input>
-                    <input type="text" placeholder="aes plain" value = {aesPlain} onChange = {e=>setAesPlain(e.target.value)}></input>
-                </div>
-                <div id="result">
-                    <p>Result</p>
-                    <input type="text" placeholder="encrypted" value = {encrypted} onChange = {e=>setEncrypted(e.target.value)}></input>
+                    EC Key: <input type="text" placeholder="ec key" value={ecKey} onChange={e=>setEcKey(e.target.value)}></input>
+                    <br/>
+                    AES Plain: <input type="text" placeholder="aes plain" value = {aesPlain} onChange = {e=>setAesPlain(e.target.value)}></input>
+                    <br/>
+                    Encrypted Result: <input type="text" placeholder="encrypted" value = {encrypted} onChange = {e=>setEncrypted(e.target.value)}></input>
+                    <br/>
+                    Decrypted Result: <input type="text" placeholder="decrypted" value = {decrypted} onChange = {e=>setDecrypted(e.target.value)}></input>
                 </div>
                 <div id="encrypt_click">
                     <button onClick={callEncryptAPI}>Encrypt</button>
-                </div>
-            </div>
-
-            <div id="decrypt">
-                <p>Decrypt</p>
-                <div id="input">
-                    <p>Input: </p>
-                    <input type="text" placeholder = "encrypted result"></input>
-                </div>
-                <div id="result">
-                    <p>Result: </p>
-                    <input type="text" placeholder = "decrypted"></input>
-                </div>
-                <div id="decrypt_click">
+                    <br/>
                     <button onClick={callDecryptAPI}>Decrypt</button>
                 </div>
             </div>

@@ -69,7 +69,7 @@ app.post('/decrypt', async(req, res) => {
         let ttt = await ecies.decrypt(privateKey, encrypted)
         let aes_plain_re = aes.decrypt(ttt.toString('utf8'), options)
         res.send({
-            "AES plain text": aes_plain_re
+            "decrypted": aes_plain_re
         })
     } catch (err) {
         console.error(err)
