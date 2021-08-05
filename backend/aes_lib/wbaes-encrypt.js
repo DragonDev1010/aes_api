@@ -142,33 +142,6 @@
         }
         return ciphertext;
     };
-    Aes.decrypt = function(ciphertext, configuration) {
-        if (typeof configuration === 'undefined') {
-            configuration = {};
-        }
-        switch (configuration.encoding) {
-            case 'hex':
-                ciphertext = Aes.a2s(Aes.h2a(ciphertext));
-                break;
-            default:
-                break;
-        }
-        var ctrTxt = ciphertext.slice(0, Aes.blockSize);
-        var counterBlock = Aes.s2a(ctrTxt);
-        var plaintextBytes = Aes.decryptBytes(ciphertext, counterBlock);
-        var plaintext = '';
-        switch (configuration.encoding) {
-            case 'binary':
-                plaintext = Aes.a2s(plaintextBytes);
-                break;
-            case 'hex':
-                plaintext = Aes.a2h(plaintextBytes);
-                break;
-            default:
-                plaintext = Aes.utf8Decode(Aes.a2s(plaintextBytes));
-        }
-        return plaintext;
-    };
     Aes.decryptBytes = function(ciphertext, counterBlock) {
         var i,
             b;
@@ -297,6 +270,5 @@
     };
     return {
         encrypt: Aes.encrypt,
-        decrypt: Aes.decrypt
     };
 }));

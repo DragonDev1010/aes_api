@@ -3,6 +3,8 @@
 var cors = require('cors')
 
 var aes = require('./aes_lib/wbaes-smoke-umd.js')
+var aes_encrypt = require('./aes_lib/wbaes-encrypt.js')
+var aes_decrypt = require('./aes_lib/wbaes-decrypt.js')
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -48,7 +50,7 @@ app.post('/encrypt', async (req, res) => {
         let publicKey = ecies.getPublic(privateKey)
 
 
-        var cipher_txt = aes.encrypt(aes_plain, options)
+        var cipher_txt = aes_encrypt.encrypt(aes_plain, options)
         let encrypted = await ecies.encrypt(publicKey, cipher_txt);
 
         
@@ -67,7 +69,7 @@ app.post('/decrypt', async(req, res) => {
         const privateKey = Buffer.from(req.body.privateKey, 'base64')
         
         let ttt = await ecies.decrypt(privateKey, encrypted)
-        let aes_plain_re = aes.decrypt(ttt.toString('utf8'), options)
+        let aes_plain_re = aes_decrypt.decrypt(ttt.toString('utf8'), options)
         res.send({
             "decrypted": aes_plain_re
         })
@@ -75,17 +77,4 @@ app.post('/decrypt', async(req, res) => {
         console.error(err)
     }
 })
-function encrypt(plain) {
-    var temp = aes.encrypt(plain, options)
-    return (temp);
-}
-function str2ab(str) {
-    var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-    var bufView = new Uint16Array(buf);
-    for (var i=0, strLen=str.length; i < strLen; i++) {
-      bufView[i] = str.charCodeAt(i);
-    }
-    return buf;
-  }
 var server = app.listen(8080, () => console.log(`Started server at http://localhost:8080!`));
-// server.close()
