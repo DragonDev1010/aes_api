@@ -25,6 +25,16 @@ app.get('/', async(req, res) => {
         "cdg": "cdg great"
     })
 })
+app.post('/test', async(req, res) => {
+    try{
+        res.send({
+            "result": req.body.title,
+            "ec Key": req.body.ecKey
+        })
+    } catch (err) {
+        console.error(err)
+    }
+})
 app.post('/encrypt', async (req, res) => {
     try{
         const aes_plain = req.body.aesPlain
@@ -44,7 +54,7 @@ app.post('/encrypt', async (req, res) => {
         
 
         res.send({
-            "Encrypted Result (base64)": encrypted.toString('base64'),
+            "encrypted": encrypted.toString('base64'),
             "privateKey": privateKey.toString('base64')
         })
     } catch (err) {
